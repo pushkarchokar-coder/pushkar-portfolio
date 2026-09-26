@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/prepare-pages.js",
     "lint": "oxlint",
     "refresh:wakatime": "node scripts/refresh-wakatime.js",
     "preview": "vite preview"

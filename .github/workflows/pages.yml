@@ -3,12 +3,19 @@ name: Deploy portfolio to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'index.html'
+      - 'assets/**'
+      - 'favicon.svg'
+      - 'icons.svg'
+      - 'api/wakatime.json'
+      - '.nojekyll'
   workflow_dispatch:
   schedule:
     - cron: '*/15 * * * *'
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -37,6 +44,16 @@ jobs:
           WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
       - name: Build site
         run: npm run build
+      - name: Publish built files at repository root
+        run: |
+          node scripts/publish-pages-root.js
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .nojekyll index.html assets favicon.svg icons.svg api/wakatime.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Publish built portfolio files'
+            git push
+          fi
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
