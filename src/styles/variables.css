@@ -1,0 +1,47 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+}
+
+:root {
+  color-scheme: light;
+  --bg: #edf2f9;
+  --surface: rgba(255, 255, 255, .68);
+  --surface-subtle: rgba(255, 255, 255, .44);
+  --text: #1b2540;
+  --text-secondary: #59657d;
+  --text-muted: #8490a5;
+  --border: rgba(91, 113, 155, .19);
+  --accent: #5a73bd;
+  --accent-hover: #465ea5;
+  --focus: rgba(90, 115, 189, .28);
+  --shadow: 0 12px 32px rgba(43, 63, 105, .075);
+  --glass-header: rgba(247, 250, 255, .7);
+  --glass-panel: rgba(255, 255, 255, .48);
+  --glass-hover: rgba(255, 255, 255, .7);
+  --font-sans: Inter, Geist, Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --content-width: 1080px;
+  --header-height: 68px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0c1220;
+  --surface: rgba(23, 33, 54, .72);
+  --surface-subtle: rgba(33, 46, 72, .52);
+  --text: #f0f4ff;
+  --text-secondary: #b3bfd8;
+  --text-muted: #8290ac;
+  --border: rgba(166, 187, 229, .17);
+  --accent: #a1b8f5;
+  --accent-hover: #bfd0ff;
+  --focus: rgba(161, 184, 245, .34);
+  --shadow: 0 12px 32px rgba(0, 0, 0, .22);
+  --glass-header: rgba(14, 21, 36, .72);
+  --glass-panel: rgba(25, 37, 61, .56);
+  --glass-hover: rgba(40, 56, 87, .58);
+}
