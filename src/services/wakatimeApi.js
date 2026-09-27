@@ -1,20 +1,14 @@
 const ENDPOINT = import.meta.env.VITE_WAKATIME_ENDPOINT || `${import.meta.env.BASE_URL}api/wakatime.json`
-export const wakatimeProfileUrl = import.meta.env.VITE_WAKATIME_PROFILE_URL || 'https://wakatime.com'
-let cachedPayload
-let pendingRequest
+let cached
+let pending
 
-async function getData({ refresh = false } = {}) {
-  if (refresh) { cachedPayload = undefined; pendingRequest = undefined }
-  if (cachedPayload) return cachedPayload
-  if (!pendingRequest) {
-    pendingRequest = fetch(`${ENDPOINT}?v=${Date.now()}`).then(async response => {
-      const payload = await response.json()
-      if (!response.ok) throw new Error(payload.error || `WakaTime request failed (${response.status})`)
-      return payload.data ?? payload
-    }).then(payload => { cachedPayload = payload; return payload }).catch(error => { pendingRequest = undefined; throw error })
-  }
-  return pendingRequest
+export async function getWakaTimeSnapshot({ refresh = false } = {}) {
+  if (refresh) { cached = undefined; pending = undefined }
+  if (cached) return cached
+  if (!pending) pending = fetch(`${ENDPOINT}?v=${Date.now()}`).then(async response => {
+    const body = await response.json()
+    if (!response.ok || body.error) throw new Error(body.error || `WakaTime request failed (${response.status}).`)
+    return body.data ?? body
+  }).then(data => { cached = data; return data }).catch(error => { pending = undefined; throw error })
+  return pending
 }
-
-export const isWakaTimeConfigured = () => true
-export const getWakaTimeSnapshot = options => getData(options)

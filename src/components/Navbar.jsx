@@ -1,38 +1,31 @@
 import { useEffect, useState } from 'react'
-import { FiMenu, FiMoon, FiSun, FiX } from 'react-icons/fi'
-import { profileImage } from '../data/profile.js'
+import { FiMenu, FiX } from 'react-icons/fi'
+import { siteConfig } from '../data/siteConfig.js'
+import { EasterEgg } from './EasterEgg.jsx'
 
-const links = [
-  { label: 'About', section: 'about' },
-  { label: 'Skills', section: 'skills' },
-  { label: 'Projects', section: 'projects' },
-  { label: 'Coding', section: 'wakatime' },
-  { label: 'GitHub', section: 'github' },
-  { label: 'Writing', section: 'blog' },
-  { label: 'Contact', section: 'contact' },
-]
-const THEME_STORAGE_KEY = 'portfolio-theme-v2'
+const links = [['About', 'about'], ['Skills', 'skills'], ['Projects', 'projects'], ['GitHub', 'github'], ['Coding', 'coding'], ['Writing', 'writing'], ['Contact', 'contact']]
 
-function ThemeToggle() {
-  const [dark, setDark] = useState(() => typeof window !== 'undefined' && localStorage.getItem(THEME_STORAGE_KEY) === 'dark')
-  useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light' }, [dark])
-  function toggle() {
-    const next = !dark
-    setDark(next)
-    document.documentElement.dataset.theme = next ? 'dark' : 'light'
-    localStorage.setItem(THEME_STORAGE_KEY, next ? 'dark' : 'light')
-  }
-  return <button className="theme-toggle" type="button" onClick={toggle} aria-label={`Switch to ${dark ? 'light' : 'dark'} theme`} aria-pressed={dark}>{dark ? <FiSun /> : <FiMoon />}</button>
-}
-
-export function Navbar({ active }) {
+export function Navbar() {
   const [open, setOpen] = useState(false)
-  const close = () => setOpen(false)
-  return <header className="site-header"><nav className="navbar wrap" aria-label="Main navigation">
-    <a className="wordmark" href="#intro" onClick={close}><span className="wordmark-mark">{profileImage ? <img src={profileImage} alt="" /> : 'P'}</span><span className="wordmark-name">Pushkar Chokar<span>.</span></span></a>
-    <div className={`nav-links ${open ? 'is-open' : ''}`}>
-      {links.map(({ label, section }) => <a key={section} className={active === section ? 'active' : ''} href={`#${section}`} onClick={close}>{label}</a>)}
-    </div>
-    <div className="nav-actions"><ThemeToggle /><button className="menu-toggle" aria-label={open ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={open} onClick={() => setOpen(!open)}>{open ? <FiX /> : <FiMenu />}</button></div>
-  </nav></header>
+  const [active, setActive] = useState('about')
+  useEffect(() => {
+    if (!('IntersectionObserver' in window)) return undefined
+    const targets = links.map(([, id]) => document.getElementById(id)).filter(Boolean)
+    const observer = new IntersectionObserver(entries => {
+      const current = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (current) setActive(current.target.id)
+    }, { rootMargin: '-18% 0px -68% 0px', threshold: [0, .3, .6] })
+    targets.forEach(target => observer.observe(target))
+    return () => observer.disconnect()
+  }, [])
+  return <header className="topbar">
+    <nav className="nav-inner page-width" aria-label="Main navigation">
+      <a className="brand" href="#top" onClick={() => setOpen(false)}>{siteConfig.name}<span className="brand-dot">.</span></a>
+      <button className="menu-button" type="button" aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} onClick={() => setOpen(value => !value)}>{open ? <FiX /> : <FiMenu />}</button>
+      <div className={`nav-links ${open ? 'nav-open' : ''}`}>
+        {links.map(([label, id]) => <a className={active === id ? 'nav-active' : ''} key={id} href={`#${id}`} onClick={() => setOpen(false)}>{label}</a>)}
+      </div>
+      <EasterEgg />
+    </nav>
+  </header>
 }

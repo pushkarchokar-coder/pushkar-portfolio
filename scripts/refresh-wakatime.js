@@ -5,49 +5,48 @@ import { fileURLToPath } from 'node:url'
 const outputPath = fileURLToPath(new URL('../public/api/wakatime.json', import.meta.url))
 const apiKey = process.env.WAKATIME_API_KEY
 
-function summarize(days, field) {
-  const totals = new Map()
-  for (const day of days) {
-    for (const item of day[field] ?? []) {
-      totals.set(item.name, (totals.get(item.name) ?? 0) + (item.total_seconds ?? 0))
-    }
-  }
-  const totalSeconds = [...totals.values()].reduce((sum, seconds) => sum + seconds, 0)
-  return [...totals.entries()]
-    .map(([name, seconds]) => ({ name, seconds, percent: totalSeconds ? seconds / totalSeconds * 100 : 0 }))
-    .sort((first, second) => second.seconds - first.seconds)
-}
-
-async function getSummary(range) {
-  const response = await fetch(`https://wakatime.com/api/v1/users/current/summaries?range=${encodeURIComponent(range)}`, {
+async function getWaka(path) {
+  const response = await fetch(`https://wakatime.com/api/v1${path}`, {
     headers: { Authorization: `Basic ${Buffer.from(apiKey).toString('base64')}`, Accept: 'application/json' },
     signal: AbortSignal.timeout(15000),
   })
+  const payload = await response.json()
   if (!response.ok) throw new Error(`WakaTime returned HTTP ${response.status}`)
-  return response.json()
+  return payload
 }
 
 let payload
 if (!apiKey) {
-  payload = { error: 'Add WAKATIME_API_KEY to the repository Actions secrets to enable coding stats.' }
+  payload = { error: 'WakaTime activity is not configured yet.' }
 } else {
-  const [today, yesterday, recent] = await Promise.all([
-    getSummary('Today'),
-    getSummary('Yesterday'),
-    getSummary('Last 7 Days'),
+  const [allTime, today, yesterday, week] = await Promise.all([
+    getWaka('/users/current/all_time_since_today'),
+    getWaka('/users/current/summaries?range=Today'),
+    getWaka('/users/current/summaries?range=Yesterday'),
+    getWaka('/users/current/summaries?range=Last%207%20Days'),
   ])
-  const todaySummary = today.data?.[0] ?? {}
-  const yesterdaySummary = yesterday.data?.[0] ?? {}
-  const recentDays = recent.data ?? []
+  const days = week.data ?? []
+  const languages = new Map()
+  const editors = new Map()
+  for (const day of days) {
+    for (const language of day.languages ?? []) languages.set(language.name, (languages.get(language.name) ?? 0) + (language.total_seconds ?? 0))
+    for (const editor of day.editors ?? []) editors.set(editor.name, (editors.get(editor.name) ?? 0) + (editor.total_seconds ?? 0))
+  }
+  const languagesTotal = [...languages.values()].reduce((sum, value) => sum + value, 0)
+  const weekSeconds = days.reduce((sum, day) => sum + (day.grand_total?.total_seconds ?? 0), 0)
   payload = { data: {
-    todaySeconds: todaySummary.grand_total?.total_seconds ?? 0,
-    yesterdaySeconds: yesterdaySummary.grand_total?.total_seconds ?? 0,
-    languages: summarize(recentDays, 'languages'),
-    editors: summarize(recentDays, 'editors'),
+    totalSeconds: allTime.data?.total_seconds ?? allTime.data?.seconds ?? 0,
+    todaySeconds: today.data?.[0]?.grand_total?.total_seconds ?? 0,
+    yesterdaySeconds: yesterday.data?.[0]?.grand_total?.total_seconds ?? 0,
+    weekSeconds,
+    dailyAverageSeconds: allTime.data?.daily_average ?? weekSeconds / 7,
+    languages: [...languages.entries()].map(([name, seconds]) => ({ name, seconds, percent: languagesTotal ? seconds / languagesTotal * 100 : 0 })).sort((a, b) => b.seconds - a.seconds),
+    editors: [...editors.entries()].map(([name, seconds]) => ({ name, seconds })).sort((a, b) => b.seconds - a.seconds),
+    days: days.map(day => ({ date: day.range?.date || day.range?.start || '', label: day.range?.date ? new Intl.DateTimeFormat('en', { weekday: 'short' }).format(new Date(`${day.range.date}T12:00:00`)) : '', seconds: day.grand_total?.total_seconds ?? 0 })),
     updatedAt: new Date().toISOString(),
   } }
 }
 
 await mkdir(dirname(outputPath), { recursive: true })
 await writeFile(outputPath, `${JSON.stringify(payload)}\n`, 'utf8')
-console.log(apiKey ? 'WakaTime snapshot refreshed.' : 'WakaTime key is not configured; wrote a setup message.')
+console.log(apiKey ? 'WakaTime snapshot refreshed.' : 'WakaTime key is not configured; wrote an honest setup state.')
