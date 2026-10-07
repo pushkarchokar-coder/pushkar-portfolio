@@ -2,27 +2,15 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/pushkar-portfolio/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#070A12" />
-    <script>
-      let initialTheme
-      try {
-        const savedTheme = localStorage.getItem('portfolio-theme')
-        initialTheme = savedTheme === 'light' || savedTheme === 'day'
-          ? 'day'
-          : savedTheme === 'dark' || savedTheme === 'night'
-            ? 'night'
-            : null
-      } catch {}
-      document.documentElement.dataset.theme = initialTheme || (matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night')
-      document.querySelector('meta[name="theme-color"]').content = document.documentElement.dataset.theme === 'day' ? '#F6F8FC' : '#070A12'
-    </script>
     <meta name="description" content="Pushkar Chokar is a frontend developer and B.Tech CSE student building clean, responsive web experiences while growing toward full-stack development." />
     <title>Pushkar Chokar — Frontend Developer</title>
+    <script type="module" crossorigin src="/pushkar-portfolio/assets/app-CrfNp5oc.js"></script>
+    <link rel="stylesheet" crossorigin href="/pushkar-portfolio/assets/app-BZSpvSfu.css">
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
