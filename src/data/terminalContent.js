@@ -9,15 +9,17 @@ export const terminalCommands = [
   {
     command: 'skills',
     output: [
-      { text: 'HTML · CSS · JavaScript · React.js · Java · C · Git · GitHub', kind: 'skills' },
+      { items: ['HTML', 'CSS', 'JavaScript', 'React.js', 'Java', 'C', 'Git', 'GitHub'], kind: 'skills' },
     ],
   },
   {
     command: 'currently',
     output: [
-      { text: 'Learning backend development', kind: 'muted' },
-      { text: 'Exploring APIs and building', kind: 'muted' },
-      { text: 'Open to software internships', kind: 'muted' },
+      { items: [
+        'Learning backend development',
+        'Exploring APIs & full-stack development',
+        'Preparing for software engineering internships',
+      ], kind: 'currently' },
     ],
   },
 ]

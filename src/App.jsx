@@ -9,10 +9,11 @@ import { Writing } from './sections/Writing.jsx'
 import { Contact } from './sections/Contact.jsx'
 import { useGitHub } from './hooks/useGitHub.js'
 import { siteConfig } from './data/siteConfig.js'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 
 export default function App() {
   const github = useGitHub()
-  return <div className="site-shell">
+  return <ThemeProvider><div className="site-shell">
     <div className="ambient ambient-purple" aria-hidden="true" />
     <div className="ambient ambient-cyan" aria-hidden="true" />
     <Navbar />
@@ -27,5 +28,5 @@ export default function App() {
       <Contact />
     </main>
     <footer className="footer page-width"><span>© {new Date().getFullYear()} {siteConfig.name}</span><a href="#top">Back to top ↑</a></footer>
-  </div>
+  </div></ThemeProvider>
 }

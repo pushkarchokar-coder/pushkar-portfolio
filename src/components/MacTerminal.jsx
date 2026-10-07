@@ -8,6 +8,7 @@ function prefersReducedMotion() {
 export function MacTerminal() {
   const [visibleCount, setVisibleCount] = useState(() => prefersReducedMotion() ? terminalCommands.length : 0)
   const [typedCommand, setTypedCommand] = useState('')
+  const [loginTime] = useState(() => new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date()))
 
   useEffect(() => {
     if (prefersReducedMotion()) return undefined
@@ -45,20 +46,22 @@ export function MacTerminal() {
     }
   }, [])
 
-  return <div className="mac-terminal" role="region" aria-label="Terminal-style introduction">
-    <div className="mac-terminal-bar">
+  return <section className="mac-terminal" role="region" aria-label="Terminal-style introduction">
+    <header className="mac-terminal-bar">
       <span className="mac-traffic-lights" aria-hidden="true"><i /><i /><i /></span>
-      <span className="mac-terminal-title">pushkar@portfolio ~</span>
-      <span className="mac-terminal-spacer" aria-hidden="true" />
-    </div>
-    <div className="mac-terminal-body" aria-label="Developer introduction">
-      <p className="terminal-login">Last login: today</p>
+      <span className="mac-terminal-title">pushkar@portfolio — zsh</span>
+      <span className="mac-terminal-status"><i />Online</span>
+    </header>
+    <div className="mac-terminal-body">
+      <p className="terminal-login">Last login: today at {loginTime}</p>
       {terminalCommands.slice(0, visibleCount).map(item => <div className="mac-terminal-block" key={item.command}>
         <p className="mac-command"><span>pushkar@portfolio ~ %</span> {item.command}</p>
-        {item.output.map((line, lineIndex) => <p className={`mac-output mac-output-${line.kind}`} key={`${item.command}-${lineIndex}`}>{line.text}</p>)}
+        {item.output.map((line, lineIndex) => line.items
+          ? <ul className={`mac-output-list mac-output-${line.kind}`} key={`${item.command}-${lineIndex}`}>{line.items.map(output => <li key={output}>{output}</li>)}</ul>
+          : <p className={`mac-output mac-output-${line.kind}`} key={`${item.command}-${lineIndex}`}>{line.text}</p>)}
       </div>)}
-      {visibleCount < terminalCommands.length && <p className="mac-command mac-command-current"><span>pushkar@portfolio ~ %</span> {typedCommand}<i className="terminal-cursor" aria-hidden="true">▍</i></p>}
-      {visibleCount === terminalCommands.length && <p className="mac-command mac-command-current"><span>pushkar@portfolio ~ %</span> <i className="terminal-cursor" aria-hidden="true">▍</i></p>}
+      {visibleCount < terminalCommands.length && <p className="mac-command mac-command-current"><span>pushkar@portfolio ~ %</span> {typedCommand}<i className="terminal-cursor" aria-hidden="true" /></p>}
+      {visibleCount === terminalCommands.length && <p className="mac-command mac-command-current"><span>pushkar@portfolio ~ %</span> <i className="terminal-cursor" aria-hidden="true" /></p>}
     </div>
-  </div>
+  </section>
 }

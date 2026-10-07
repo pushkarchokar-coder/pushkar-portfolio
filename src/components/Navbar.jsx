@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { FiMenu, FiX } from 'react-icons/fi'
 import { siteConfig } from '../data/siteConfig.js'
 import { EasterEgg } from './EasterEgg.jsx'
+import { ThemeSwitcher } from './ThemeSwitcher.jsx'
 
 const links = [['About', 'about'], ['Skills', 'skills'], ['Projects', 'projects'], ['GitHub', 'github'], ['Coding', 'coding'], ['Writing', 'writing'], ['Contact', 'contact']]
 
@@ -25,6 +26,7 @@ export function Navbar() {
       <div className={`nav-links ${open ? 'nav-open' : ''}`}>
         {links.map(([label, id]) => <a className={active === id ? 'nav-active' : ''} key={id} href={`#${id}`} onClick={() => setOpen(false)}>{label}</a>)}
       </div>
+      <ThemeSwitcher />
       <EasterEgg />
     </nav>
   </header>

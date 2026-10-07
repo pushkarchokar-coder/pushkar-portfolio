@@ -8,11 +8,11 @@
 @keyframes role-shimmer { 0%, 100% { background-position: 100% 50%; } 50% { background-position: 0% 50%; } }
 @keyframes role-glow { 0%, 100% { text-shadow: 0 0 5px rgba(124, 92, 252, .14); } 50% { text-shadow: 0 0 12px rgba(124, 92, 252, .36), 0 0 18px rgba(34, 211, 238, .12); } }
 @keyframes ambient-drift { from { transform: translate3d(-12px, -8px, 0) scale(.96); } to { transform: translate3d(18px, 24px, 0) scale(1.04); } }
-@keyframes orbit-breathe { 0%, 100% { box-shadow: 0 0 35px rgba(124, 92, 252, .06), inset 0 0 30px rgba(124, 92, 252, .035); } 50% { box-shadow: 0 0 42px rgba(124, 92, 252, .12), inset 0 0 34px rgba(34, 211, 238, .055); } }
 @keyframes skeleton-pulse { from { opacity: .42; } to { opacity: .9; } }
 @keyframes skeleton-sweep { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 @keyframes bar-enter { to { transform: scaleX(1); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  .mac-command-current .terminal-cursor { animation: none !important; visibility: visible !important; }
 }
